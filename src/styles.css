@@ -1,0 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5em;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.timesList {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.timesList__day {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "title times";
+}
+
+.timesList__day__title {
+    grid-area: title;
+
+    overflow: hidden;
+}
+
+.timesList__day__title__date {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timesList__day__title__description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timesList__day__times {
+    grid-area: times;
+
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.timesList__day__times__entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "title . time";
+}
+
+.timesList__day__times__entry__title {
+    grid-area: title;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.timesList__day__times__entry__time {
+    grid-area: time;
+
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
