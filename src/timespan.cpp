@@ -3,27 +3,22 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+#include "timespan.h"
 
-class Timespan
-{
-    time_t start;
-    time_t end;
+Timespan::Timespan(tm start, tm end) {
+    this->start = start;
+    this->end = end;
+}
 
-public:
-    Timespan(time_t start, time_t end)
-    {
-        this->start = start;
-        this->end = end;
-    }
+Timespan::Timespan(tm time) {
+    this->start = time;
+    this->end = time;
+}
 
-    Timespan(time_t time)
-    {
-        this->start = time;
-        this->end = time;
-    }
+tm Timespan::getStart() const {
+    return this->start;
+}
 
-    time_t getStart() { return start; }
-
-    time_t getEnd() { return end; }
-};
+tm Timespan::getEnd() const {
+    return this->end;
+}

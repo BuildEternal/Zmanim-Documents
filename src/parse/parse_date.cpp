@@ -5,7 +5,6 @@
 #include <regex>
 
 #include "../time_util.h"
-#include "../invalid_date_exception.h"
 
 using namespace std;
 
@@ -24,7 +23,8 @@ tm parseDate(vector<string>& args)
         bool matched = regex_match(date_str, date_match, date_re);
 
         if (!matched)
-            throw InvalidDateException(date_str);
+            throw std::invalid_argument("The date '" + date_str + "' is invalid. Make sure it is a valid date, is "
+                "formatted as 'dd/mm/yy' or 'dd/mm/yyyy', and is within a reasonable time frame.");
 
         int day = stoi(date_match[2]);
         int month = stoi(date_match[1]);
@@ -44,10 +44,11 @@ tm parseDate(vector<string>& args)
         };
 
         if (!valid_dmy(date))
-            throw InvalidDateException(date_str);
+            throw std::invalid_argument("The date '" + date_str + "' is invalid. Make sure it is a valid date, is "
+                "formatted as 'dd/mm/yy' or 'dd/mm/yyyy', and is within a reasonable time frame.");
 
         return date;
     }
 
-    throw InvalidDateException("");
+    throw std::invalid_argument("No date was entered.");
 }
