@@ -10,6 +10,7 @@ OBJS += src/zmanim/zman_info.o
 # ---
 
 # Include directories
+INCS += src
 INCS += vendor
 INCS += vendor/json/include
 # ---

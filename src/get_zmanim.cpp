@@ -69,25 +69,29 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
         date.tm_mday += daysIndex;
         date = normalizeTm(date);
 
-        std::cout << "Date: " << date.tm_mon << '/' << date.tm_mday << '/' << date.tm_year << std::endl;
+        // std::cout << "Date: " << date.tm_mon << '/' << date.tm_mday << '/' << date.tm_year << std::endl;
 
-        std::string holiday = ""; {
+        std::string holiday;
+
+        {
             json holidayJson = dayJson["HolidayName"];
 
             if (holidayJson.type() == json::value_t::string)
                 holiday = holidayJson.get<std::string>();
         }
 
-        std::cout << "Holiday: " << holiday << std::endl;
+        // std::cout << "Holiday: " << holiday << std::endl;
 
-        std::string parsha = ""; {
+        std::string parsha;
+
+        {
             json parshaJson = dayJson["Parsha"];
 
             if (parshaJson.type() == json::value_t::string)
                 parsha = parshaJson.get<std::string>();
         }
 
-        std::cout << "Parsha: " << parsha << std::endl;
+        // std::cout << "Parsha: " << parsha << std::endl;
 
         std::vector<ZmanInfo> zmanim;
 
@@ -99,8 +103,8 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
             std::string title = zmanJson["Title"].get<std::string>();
             std::string zman = zmanJson["Items"][0]["Zman"].get<std::string>();
 
-            std::cout << "Title: " << title << std::endl;
-            std::cout << "Zman: " << zman << std::endl;
+            // std::cout << "Title: " << title << std::endl;
+            // std::cout << "Zman: " << zman << std::endl;
 
             ZmanInfo zmanInfo(title, zman);
 
@@ -114,15 +118,15 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
 
     std::string location = zmanimJson["LocationName"].get<std::string>();
 
-    std::cout << "Location: " << location << std::endl;
+    // std::cout << "Location: " << location << std::endl;
 
     std::string locationDetails = zmanimJson["LocationDetails"].get<std::string>();
 
-    std::cout << "Location Details: " << locationDetails << std::endl;
+    // std::cout << "Location Details: " << locationDetails << std::endl;
 
     std::string returnedLocationId = zmanimJson["LocationId"].get<std::string>();
 
-    std::cout << "Location ID: " << returnedLocationId << std::endl;
+    // std::cout << "Location ID: " << returnedLocationId << std::endl;
 
     DocumentInfo documentInfo(days, location, locationDetails, returnedLocationId);
 

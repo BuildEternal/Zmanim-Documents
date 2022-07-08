@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ctime>
 
+#include "time_util.h"
+
 using namespace std;
 
 tm normalizeTm(tm toNormalize) {
@@ -32,4 +34,40 @@ bool valid_dmy(const tm& check) {
     return check.tm_mday == copy.tm_mday &&
         check.tm_mon == copy.tm_mon &&
         check.tm_year == copy.tm_year;
+}
+
+std::string DateToString::months[12] = {
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+};
+
+std::string DateToString::dateSuffixes[10] = {
+    "th",
+    "st",
+    "nd",
+    "rd",
+    "th",
+    "th",
+    "th",
+    "th",
+    "th",
+    "th"
+};
+
+std::string DateToString::monthToString(int month) {
+    return months[month];
+}
+
+std::string DateToString::dateToSuffix(int date) {
+    return dateSuffixes[date % 10];
 }

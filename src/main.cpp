@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -27,11 +28,22 @@ int main(int argc, char* argv[])
         int day = givenDate.tm_mday;
         int year = givenDate.tm_year + 1900;
 
-        std::cout << month << '/' << day << '/' << year << " is the date you have inputted. It is valid." << std::endl;
+        // std::cout << month << '/' << day << '/' << year << " is the date you have inputted. It is valid." << std::endl;
 
         Timespan timespan(givenDate);
-
+        // std::cout << 1 << std::endl;
+        // std::vector<DayInfo> b;
+        // b.push_back(DayInfo(givenDate, "", "", { ZmanInfo("", "") }));
+        // std::cout << 2 << std::endl;
+        // DocumentInfo a(b, "", "", "");
+        // std::cout << 3 << std::endl;
         DocumentInfo zmanimJson = get_zmanim(timespan, 2, 2135);
+
+        std::ofstream outputFile("zmanim.html");
+
+        outputFile << zmanimJson.getHtml();
+
+        outputFile.close();
     }
     catch (std::exception& e) {
         std::cout << e.what() << std::endl;
