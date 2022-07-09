@@ -8,6 +8,7 @@
 #include "get_zmanim.h"
 #include "timespan.h"
 #include "zmanim/document_info.h"
+#include "time_util.h"
 
 using json = nlohmann::json;
 
@@ -23,14 +24,17 @@ int main(int argc, char* argv[])
 
     try {
         tm givenDate = parseDate(args);
+        tm nextDate = givenDate;
+        nextDate.tm_mday++;
+        nextDate = normalizeTm(nextDate);
 
-        int month = givenDate.tm_mon + 1;
-        int day = givenDate.tm_mday;
-        int year = givenDate.tm_year + 1900;
+        // int month = givenDate.tm_mon + 1;
+        // int day = givenDate.tm_mday;
+        // int year = givenDate.tm_year + 1900;
 
         // std::cout << month << '/' << day << '/' << year << " is the date you have inputted. It is valid." << std::endl;
 
-        Timespan timespan(givenDate);
+        Timespan timespan(givenDate, nextDate);
         // std::cout << 1 << std::endl;
         // std::vector<DayInfo> b;
         // b.push_back(DayInfo(givenDate, "", "", { ZmanInfo("", "") }));
