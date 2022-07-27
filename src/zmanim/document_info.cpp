@@ -6,7 +6,7 @@
 #include "day_info.h"
 
 std::string DocumentInfo::htmlTemplate = ""
-#include "../html/document.html"
+#include "../html/document.txt"
 ;
 
 DocumentInfo::DocumentInfo(

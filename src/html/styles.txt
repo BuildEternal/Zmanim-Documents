@@ -1,0 +1,102 @@
+R"===(
+
+* {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5em;
+}
+
+body {
+    /* spacing */
+    --spacing: 5px;
+    --border-width: 2px;
+
+    /* colors */
+    --day-border: darkblue;
+    --zmanim-list-secondary-color: hsl(240, 100%, 98%);
+
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    margin: var(--spacing) 0;
+}
+
+.dayInfo {
+    border-top: var(--border-width) solid var(--day-border);
+    border-bottom: var(--border-width) solid var(--day-border);
+    margin: var(--spacing);
+    margin-bottom: calc(-1 * var(--spacing) - var(--border-width));
+
+    /* break-after: page; */
+    page-break-inside: avoid;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "title times";
+}
+
+.dayInfo__title {
+    grid-area: title;
+
+    margin: 0 var(--spacing);
+
+    overflow: hidden;
+}
+
+.dayInfo__title__date {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dayInfo__title__description {
+    font-weight: bold;
+    font-size: 1rem;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dayInfo__title__parsha__img {
+    height: 1em;
+}
+
+.dayInfo__times {
+    grid-area: times;
+
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.dayInfo__times__entry {
+    padding: var(--spacing);
+
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "title . time";
+}
+
+.dayInfo__times__entry:nth-child(even) {
+    background-color: var(--zmanim-list-secondary-color);
+}
+
+.dayInfo__times__entry__title {
+    grid-area: title;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.dayInfo__times__entry__time {
+    grid-area: time;
+
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+)==="

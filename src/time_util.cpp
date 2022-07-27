@@ -69,5 +69,5 @@ std::string DateToString::monthToString(int month) {
 }
 
 std::string DateToString::dateToSuffix(int date) {
-    return dateSuffixes[date % 10];
+    return 11 <= date && date <= 13 ? dateSuffixes[0] : dateSuffixes[date % 10];
 }

@@ -22,36 +22,27 @@ int main(int argc, char* argv[])
 
     time_t date;
 
-    try {
-        tm givenDate = parseDate(args);
-        tm nextDate = givenDate;
-        nextDate.tm_mday++;
-        nextDate = normalizeTm(nextDate);
+    tm givenDate = parseDate(args);
+    tm nextDate = givenDate;
+    nextDate.tm_mday += 4;
+    nextDate = normalizeTm(nextDate);
 
-        // int month = givenDate.tm_mon + 1;
-        // int day = givenDate.tm_mday;
-        // int year = givenDate.tm_year + 1900;
+    Timespan timespan(givenDate, nextDate);
 
-        // std::cout << month << '/' << day << '/' << year << " is the date you have inputted. It is valid." << std::endl;
+    DocumentInfo zmanimJson = get_zmanim(timespan, 2, 2135);
 
-        Timespan timespan(givenDate, nextDate);
-        // std::cout << 1 << std::endl;
-        // std::vector<DayInfo> b;
-        // b.push_back(DayInfo(givenDate, "", "", { ZmanInfo("", "") }));
-        // std::cout << 2 << std::endl;
-        // DocumentInfo a(b, "", "", "");
-        // std::cout << 3 << std::endl;
-        DocumentInfo zmanimJson = get_zmanim(timespan, 2, 2135);
+    std::string css = ""
+        #include "html/styles.txt"
+    ;
 
-        std::ofstream outputFile("zmanim.html");
+    std::ofstream outputHtml("zmanim.html");
+    std::ofstream outputCss("styles.css");
 
-        outputFile << zmanimJson.getHtml();
+    outputHtml << zmanimJson.getHtml();
+    outputCss << css;
 
-        outputFile.close();
-    }
-    catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
-    }
+    outputHtml.close();
+    outputCss.close();
 
     return 0;
 }

@@ -6,7 +6,7 @@
 #include "zman_info.h"
 
 std::string ZmanInfo::htmlTemplate = ""
-#include "../html/zman.html"
+#include "../html/zman.txt"
 ;
 
 ZmanInfo::ZmanInfo(std::string newTitle, std::string newZman) : title(newTitle), zman(newZman) {

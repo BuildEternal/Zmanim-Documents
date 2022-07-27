@@ -4,7 +4,9 @@ R"===(
     <div class="dayInfo__title">
         <h1 class="dayInfo__title__date">{date}</h1>
         <p class="dayInfo__title__description">{hebrew_date}</p>
+        {if_holiday
         <p class="dayInfo__title__description">{holiday}</p>
+        if_holiday} {if_parsha
         <p class="dayInfo__title__description">
             <img
                 class="dayInfo__title__parsha__img"
@@ -12,6 +14,7 @@ R"===(
             />
             {parsha}
         </p>
+        if_parsha}
     </div>
     <ol class="dayInfo__times">
         {zmanim}
