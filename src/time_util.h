@@ -8,12 +8,8 @@ bool valid_dmy(const tm& check);
 
 std::string monthName(int month);
 
-std::string dateSuffix(int day);
+std::string monthToString(int month);
 
-class DateToString {
-    static std::string months[12];
-    static std::string dateSuffixes[10];
-public:
-    static std::string monthToString(int month);
-    static std::string dateToSuffix(int date);
-};
+std::string dateToSuffix(int date);
+
+bool lessTm(tm a, tm b);

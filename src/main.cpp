@@ -1,48 +1,23 @@
-#include <fstream>
 #include <iostream>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
-#include "parse/parse_date.h"
-#include "get_zmanim.h"
-#include "timespan.h"
-#include "zmanim/document_info.h"
-#include "time_util.h"
-
-using json = nlohmann::json;
+#include "parse/args.h"
+#include "parse/parse_command.h"
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> args;
+    std::vector<std::string> args = argsToArgsVector(argc, argv);
 
-    if (argc > 1) {
-        args.assign(argv + 1, argv + argc);
+    try {
+
+        parseCommand(args);
     }
-
-    time_t date;
-
-    tm givenDate = parseDate(args);
-    tm nextDate = givenDate;
-    nextDate.tm_mday += 4;
-    nextDate = normalizeTm(nextDate);
-
-    Timespan timespan(givenDate, nextDate);
-
-    DocumentInfo zmanimJson = get_zmanim(timespan, 2, 2135);
-
-    std::string css = ""
-        #include "html/styles.txt"
-    ;
-
-    std::ofstream outputHtml("zmanim.html");
-    std::ofstream outputCss("styles.css");
-
-    outputHtml << zmanimJson.getHtml();
-    outputCss << css;
-
-    outputHtml.close();
-    outputCss.close();
+    catch (std::invalid_argument& e) {
+        std::cout << "Something was wrong with your command:\n" << e.what();
+    }
+    catch (std::exception& e) {
+        std::cout << "Something went wrong:\n" << e.what();
+    }
 
     return 0;
 }

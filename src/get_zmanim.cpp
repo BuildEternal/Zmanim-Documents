@@ -1,10 +1,14 @@
 #include <iostream>
 #include <ctime>
+#include <regex>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "cpp-httplib/httplib.h"
 #include "timespan.h"
-#include "json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "zmanim/day_info.h"
 #include "zmanim/document_info.h"
 #include "zmanim/zman_info.h"
@@ -12,18 +16,49 @@
 
 using json = nlohmann::json;
 
+// void parseJsonData(
+//     std::map<tm, std::map<std::string, tm>, decltype(&lessTm)>& data,
+//     const std::string& zmanDateStr,
+//     const std::string& zmanTimeStr,
+//     const std::string& zmanIdStr
+// ) {
+//     std::regex dateRegex(R"((\d{4})-(\d{2})-(\d{2}))");
+//     std::smatch dateVals;
+//     std::regex_search(zmanDateStr, dateVals, dateRegex);
+
+//     tm zmanDateTm = {
+//         .tm_mday = std::stoi(dateVals[3]),
+//         .tm_mon = std::stoi(dateVals[2]) - 1,
+//         .tm_year = std::stoi(dateVals[1]) - 1900,
+//     };
+
+//     std::regex timeRegex(R"((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(?:\d{2}))");
+//     std::smatch timeVals;
+//     std::regex_search(zmanTimeStr, timeVals, timeRegex);
+
+//     tm zmanTimeTm = {
+//         .tm_min = std::stoi(timeVals[5]),
+//         .tm_hour = std::stoi(timeVals[4]),
+//         .tm_mday = std::stoi(timeVals[3]),
+//         .tm_mon = std::stoi(timeVals[2]) - 1,
+//         .tm_year = std::stoi(timeVals[1]) - 1900,
+//     };
+
+//     data[zmanDateTm][zmanIdStr] = zmanTimeTm;
+// }
+
 /**
  * @brief Gets the zmanim for the given timespan.
  *
  * @param timespan The zmanim range
  * @return The zmanim JSON data
  */
-DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int locationId) {
+DocumentInfo get_zmanim(const Timespan& timespan, std::string locationType, std::string locationId) {
     httplib::Client cli("https://www.chabad.org");
 
-    cli.set_default_headers({
-            { "Accept", "application/json" }
-        });
+    cli.set_default_headers(
+        { { "Accept", "application/json" } }
+    );
 
     tm start = timespan.getStart();
     tm end = timespan.getEnd();
@@ -51,9 +86,13 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
 
     auto res = cli.Get(requestStream.str().c_str());
 
-    if (!(res->status == 200)) throw std::runtime_error("An error accured when getting zmanim.");
+    const std::string getZmanimError = "An error accurred when getting zmanim.";
+
+    if (res->status != 200) throw std::runtime_error(getZmanimError);
 
     auto zmanimJson = json::parse(res->body);
+
+    if (zmanimJson["LocationId"].is_null()) throw std::runtime_error(getZmanimError);
 
     // Extract data from JSON
 
@@ -65,11 +104,11 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
         json dayJson = *i;
         auto daysIndex = i - daysJsonArray.begin();
 
+        // TODO: Make this parse the day in the json
+
         tm date = start;
         date.tm_mday += daysIndex;
         date = normalizeTm(date);
-
-        // std::cout << "Date: " << date.tm_mon << '/' << date.tm_mday << '/' << date.tm_year << std::endl;
 
         std::string holiday;
 
@@ -80,8 +119,6 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
                 holiday = holidayJson.get<std::string>();
         }
 
-        // std::cout << "Holiday: " << holiday << std::endl;
-
         std::string parsha;
 
         {
@@ -90,8 +127,6 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
             if (parshaJson.type() == json::value_t::string)
                 parsha = parshaJson.get<std::string>();
         }
-
-        // std::cout << "Parsha: " << parsha << std::endl;
 
         std::vector<ZmanInfo> zmanim;
 
@@ -102,9 +137,6 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
 
             std::string title = zmanJson["Title"].get<std::string>();
             std::string zman = zmanJson["Items"][0]["Zman"].get<std::string>();
-
-            // std::cout << "Title: " << title << std::endl;
-            // std::cout << "Zman: " << zman << std::endl;
 
             ZmanInfo zmanInfo(title, zman);
 
@@ -118,17 +150,90 @@ DocumentInfo get_zmanim(const Timespan& timespan, int locationType, int location
 
     std::string location = zmanimJson["LocationName"].get<std::string>();
 
-    // std::cout << "Location: " << location << std::endl;
-
     std::string locationDetails = zmanimJson["LocationDetails"].get<std::string>();
 
-    // std::cout << "Location Details: " << locationDetails << std::endl;
-
     std::string returnedLocationId = zmanimJson["LocationId"].get<std::string>();
-
-    // std::cout << "Location ID: " << returnedLocationId << std::endl;
 
     DocumentInfo documentInfo(days, location, locationDetails, returnedLocationId);
 
     return documentInfo;
+
+    // httplib::Client cli("https://www.hebcal.com");
+
+    // tm startDate = timespan.getStart();
+    // tm endDate = timespan.getEnd();
+
+    // std::string startDateStr = (std::stringstream() << std::setfill('0') <<
+    //     std::setw(4) << (startDate.tm_year + 1900) << '-' <<
+    //     std::setw(2) << (startDate.tm_mon + 1) << '-' <<
+    //     std::setw(2) << startDate.tm_mday).str();
+    // std::string endDateStr = (std::stringstream() << std::setfill('0') <<
+    //     std::setw(4) << (endDate.tm_year + 1900) << '-' <<
+    //     std::setw(2) << (endDate.tm_mon + 1) << '-' <<
+    //     std::setw(2) << endDate.tm_mday).str();
+
+    // httplib::Params params;
+    // params.emplace("cfg", "json");
+    // params.emplace("start", startDateStr);
+    // params.emplace("end", endDateStr);
+    // if (locationType == "geoname") params.emplace("geonameid", locationId);
+    // else if (locationType == "zip") params.emplace("zip", locationId);
+    // else throw std::runtime_error("Unknown location type");
+
+    // auto res = cli.Get("/zmanim", params, httplib::Headers());
+    // // std::cout << res->body << '\n';
+
+    // if (res->status != 200) throw std::runtime_error("An error occured while getting zmanim.");
+
+    // json resJson = json::parse(res->body);
+
+    // json dateJson = resJson["date"];
+    // json timesJson = resJson["times"];
+
+    // std::cout << dateJson.dump(4) << '\n';
+
+    // // First tm is only date, second tm is only time.
+    // std::map<tm, std::map<std::string, tm>, decltype(&lessTm)> zmanimData(&lessTm);
+
+    // if (dateJson.is_object()) {
+    //     for (auto& [zmanIdStr, zmanDatesJson] : timesJson.items()) {
+    //         for (auto& [zmanDateStr, zmanTimeJson] : zmanDatesJson.items()) {
+    //             std::string zmanTimeStr = zmanTimeJson.get<std::string>();
+
+    //             parseJsonData(zmanimData, zmanDateStr, zmanTimeStr, zmanIdStr);
+    //         }
+    //     }
+    // }
+    // else {
+    //     for (auto& [zmanIdStr, zmanTimeJson] : timesJson.items()) {
+    //         std::string zmanTimeStr = zmanTimeJson.get<std::string>();
+    //         std::string zmanDateStr = dateJson.get<std::string>();
+
+    //         parseJsonData(zmanimData, zmanDateStr, zmanTimeStr, zmanIdStr);
+    //     }
+    // }
+
+    // // for (auto [zmanimDate, b] : zmanimData) {
+    // //     std::cout << '\n' << zmanimDate.tm_mon + 1 << '/' << zmanimDate.tm_mday << '/' << zmanimDate.tm_year + 1900
+    // //         << ":\n";
+    // //     for (auto [zmanId, zmanTime] : b) {
+    // //         std::cout << zmanId << ' ' << ((zmanTime.tm_hour % 12) ? (zmanTime.tm_hour % 12) : 12) << ':' << zmanTime.tm_min << ' '
+    // //             << (zmanTime.tm_hour / 12 ? "PM" : "AM") << '\n';
+    // //     }
+    // // }
+
+
+    // // Build document info
+
+    // std::vector<DayInfo> days;
+
+    // for (auto& [zmanimDate, zmanimMap] : zmanimData) {
+    //     std::vector<ZmanInfo> zmanim;
+
+    //     for (auto& [zmanId, zmanTm] : zmanimMap) {
+
+    //     }
+    // }
+
+    // return DocumentInfo(std::vector<DayInfo>(), "", "", "");
 }

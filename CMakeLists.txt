@@ -6,6 +6,8 @@ project(Zmanim)
 set(SRC
     src/get_zmanim.cpp
     src/main.cpp
+    src/parse/args.cpp
+    src/parse/parse_command.cpp
     src/parse/parse_date.cpp
     src/time_util.cpp
     src/timespan.cpp

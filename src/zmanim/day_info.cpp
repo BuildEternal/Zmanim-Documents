@@ -25,8 +25,8 @@ DayInfo::DayInfo(
 
     // Date
     std::stringstream dateString;
-    dateString << DateToString::monthToString(newDate.tm_mon)
-        << ' ' << newDate.tm_mday << DateToString::dateToSuffix(newDate.tm_mday) << ", " << newDate.tm_year + 1900;
+    dateString << monthToString(newDate.tm_mon)
+        << ' ' << newDate.tm_mday << dateToSuffix(newDate.tm_mday) << ", " << newDate.tm_year + 1900;
 
     html = htmlTemplate;
 

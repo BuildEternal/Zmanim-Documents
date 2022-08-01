@@ -14,6 +14,8 @@ tm normalizeTm(tm toNormalize) {
     return *localtime(&asTimeT);
 }
 
+// TODO: eliminate this yucky method
+
 /**
  * @brief Returns if the given `tm` is valid.
  *
@@ -36,38 +38,50 @@ bool valid_dmy(const tm& check) {
         check.tm_year == copy.tm_year;
 }
 
-std::string DateToString::months[12] = {
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-};
+std::string monthToString(int month) {
+    switch (month) {
+    case 0: return "January";
+    case 1: return "February";
+    case 2: return "March";
+    case 3: return "April";
+    case 4: return "May";
+    case 5: return "June";
+    case 6: return "July";
+    case 7: return "August";
+    case 8: return "September";
+    case 9: return "October";
+    case 10: return "November";
+    case 11: return "December";
+    }
 
-std::string DateToString::dateSuffixes[10] = {
-    "th",
-    "st",
-    "nd",
-    "rd",
-    "th",
-    "th",
-    "th",
-    "th",
-    "th",
-    "th"
-};
-
-std::string DateToString::monthToString(int month) {
-    return months[month];
+    return "";
 }
 
-std::string DateToString::dateToSuffix(int date) {
-    return 11 <= date && date <= 13 ? dateSuffixes[0] : dateSuffixes[date % 10];
+std::string dateToSuffix(int date) {
+    if (11 <= date && date <= 13) return "th";
+
+    switch (date % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+    }
+}
+
+bool lessTm(tm a, tm b) {
+    if (a.tm_year < b.tm_year) return true;
+    else if (a.tm_year > b.tm_year) return false;
+
+    if (a.tm_mon < b.tm_mon) return true;
+    else if (a.tm_mon > b.tm_mon) return false;
+
+    if (a.tm_mday < b.tm_mday) return true;
+    else if (a.tm_mday > b.tm_mday) return false;
+
+    if (a.tm_hour < b.tm_hour) return true;
+    else if (a.tm_hour > b.tm_hour) return false;
+
+    if (a.tm_min < b.tm_min) return true;
+
+    return false;
 }

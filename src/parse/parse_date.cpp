@@ -4,23 +4,44 @@
 #include <iostream>
 #include <regex>
 
-#include "../time_util.h"
+#include "args.h"
+#include "parse_date.h"
+#include "time_util.h"
+#include "timespan.h"
 
-using namespace std;
+// TODO: parse phrases like "next shabbos" or "next shavuot"
 
-tm parseDate(vector<string>& args)
-{
-    if (args.size() > 0)
+Timespan parseTimespan(std::vector<std::string>& args) {
+    tm beginDate = parseDate(args);
+
+    std::string prep = peakArg(args);
+
+    if (prep == "to" || prep == "through") {
+        pullArg(args);
+
+        tm endDate = parseDate(args);
+
+        return Timespan(beginDate, endDate);
+    } else {
+        return Timespan(beginDate);
+    }
+}
+
+tm parseDate(std::vector<std::string>& args) {
+    auto date_str = pullArg(args);
+
+    if (date_str == "today" || date_str == "now") {
+        time_t now = time(NULL);
+        return *localtime(&now);
+    }
+    else if (date_str != "")
     {
-        auto date_str = args[0];
-        args.erase(args.begin());
-
         static const std::regex date_re(R"(^(\d{1,2})/(\d{1,2})/(\d{1,2}|\d{4})$)",
             std::regex::icase);
 
-        smatch date_match;
+        std::smatch date_match;
 
-        bool matched = regex_match(date_str, date_match, date_re);
+        bool matched = std::regex_match(date_str, date_match, date_re);
 
         if (!matched)
             throw std::invalid_argument("The date '" + date_str + "' is invalid. Make sure it is a valid date, is "
