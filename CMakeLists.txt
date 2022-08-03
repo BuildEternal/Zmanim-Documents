@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Zmanim)
 
 set(SRC
+    src/forecast.cpp
     src/get_zmanim.cpp
     src/main.cpp
     src/parse/args.cpp
@@ -13,12 +14,14 @@ set(SRC
     src/timespan.cpp
     src/zmanim/day_info.cpp
     src/zmanim/document_info.cpp
+    src/zmanim/weather_entry_info.cpp
     src/zmanim/zman_info.cpp
 )
 
 set(INCS
     src
     vendor
+    vendor/cpp-httplib
     vendor/json/include
 )
 

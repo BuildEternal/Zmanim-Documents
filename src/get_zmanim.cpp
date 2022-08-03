@@ -7,12 +7,14 @@
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "cpp-httplib/httplib.h"
-#include "timespan.h"
+#include "forecast.h"
 #include "nlohmann/json.hpp"
+#include "time_util.h"
+#include "timespan.h"
 #include "zmanim/day_info.h"
 #include "zmanim/document_info.h"
+#include "zmanim/weather_entry_info.h"
 #include "zmanim/zman_info.h"
-#include "time_util.h"
 
 using json = nlohmann::json;
 
@@ -53,38 +55,25 @@ using json = nlohmann::json;
  * @param timespan The zmanim range
  * @return The zmanim JSON data
  */
-DocumentInfo get_zmanim(const Timespan& timespan, std::string locationType, std::string locationId) {
+DocumentInfo get_zmanim(
+    const Timespan& timespan, std::string locationType, std::string locationId,
+    double forecastLat, double forecastLong
+) {
     httplib::Client cli("https://www.chabad.org");
-
-    cli.set_default_headers(
-        { { "Accept", "application/json" } }
-    );
 
     tm start = timespan.getStart();
     tm end = timespan.getEnd();
 
-    std::stringstream startParamStream;
-    startParamStream << "startdate=" << start.tm_mon + 1 << "%2F" << start.tm_mday << "%2F" <<
-        start.tm_year + 1900;
-
-    std::stringstream endParamStream;
-    endParamStream << "enddate=" << end.tm_mon + 1 << "%2F" << end.tm_mday << "%2F" <<
-        end.tm_year + 1900;
-
-    std::stringstream locationTypeParamStream;
-    locationTypeParamStream << "locationtype=" << locationType;
-
-    std::stringstream locationIdParamStream;
-    locationIdParamStream << "locationid=" << locationId;
-
-    std::stringstream paramsStream;
-    paramsStream << '?' << startParamStream.str() << '&' << endParamStream.str() << '&' << locationTypeParamStream.str()
-        << '&' << locationIdParamStream.str();
-
-    std::stringstream requestStream;
-    requestStream << "/webservices/zmanim/zmanim/Get_Zmanim" << paramsStream.str();
-
-    auto res = cli.Get(requestStream.str().c_str());
+    auto res = cli.Get("/webservices/zmanim/zmanim/Get_Zmanim", httplib::Params(
+        {
+            { "startdate", tmToBasicDateString(start) },
+            { "enddate", tmToBasicDateString(end) },
+            { "locationtype", locationType },
+            { "locationid", locationId }
+        }
+    ), httplib::Headers(
+        { { "Accept", "application/json" } }
+    ));
 
     const std::string getZmanimError = "An error accurred when getting zmanim.";
 
@@ -93,6 +82,8 @@ DocumentInfo get_zmanim(const Timespan& timespan, std::string locationType, std:
     auto zmanimJson = json::parse(res->body);
 
     if (zmanimJson["LocationId"].is_null()) throw std::runtime_error(getZmanimError);
+
+    auto forecast = getForecastForCoords(forecastLat, forecastLong);
 
     // Extract data from JSON
 
@@ -143,7 +134,10 @@ DocumentInfo get_zmanim(const Timespan& timespan, std::string locationType, std:
             zmanim.push_back(zmanInfo);
         }
 
-        DayInfo dayInfo(date, holiday, parsha, zmanim);
+        WeatherEntryInfo dayForecast = forecast[date][true];
+        WeatherEntryInfo nightForecast = forecast[date][false];
+
+        DayInfo dayInfo(date, holiday, parsha, zmanim, dayForecast, nightForecast);
 
         days.push_back(dayInfo);
     }
@@ -155,6 +149,17 @@ DocumentInfo get_zmanim(const Timespan& timespan, std::string locationType, std:
     std::string returnedLocationId = zmanimJson["LocationId"].get<std::string>();
 
     DocumentInfo documentInfo(days, location, locationDetails, returnedLocationId);
+
+    for (auto a : forecast) {
+        std::cout << '\n' << tmToBasicDateString(a.first) << ":\n";
+
+        for (auto b : a.second) {
+            std::cout << "  " << (b.first ? "day" : "night") << ": ";
+
+            std::cout << b.second.getTemp() << b.second.getTempUnit() << " - " << b.second.getWindDirection() << ' ' <<
+                b.second.getWindSpeed() << '\n';
+        }
+    }
 
     return documentInfo;
 

@@ -15,6 +15,7 @@ R"===(
         </p>
         if_parsha}
     </div>
+    <div class="dayInfo__weather">{day_weather} {night_weather}</div>
     <ol class="dayInfo__times">
         {zmanim}
     </ol>

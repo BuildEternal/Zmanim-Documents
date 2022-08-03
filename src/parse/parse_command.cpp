@@ -17,36 +17,11 @@
 
 using json = nlohmann::json;
 
-void parseGet(std::vector<std::string>& args);
-void parseGetZmanim(std::vector<std::string>& args);
-
-void parseCommand(std::vector<std::string>& args) {
-    std::string cmd = pullArg(args);
-
-    if (cmd == "get") {
-        parseGet(args);
-    }
-    else {
-        throw std::invalid_argument("There is no '" + cmd + "' command.");
-    }
-}
-
-void parseGet(std::vector<std::string>& args) {
-    std::string what = pullArg(args);
-
-    if (what == "zmanim" || what == "times") {
-        parseGetZmanim(args);
-    }
-    else {
-        throw std::invalid_argument("The meaning of '" + what + "' in this context is unknown.");
-    }
-}
-
 void parseGetZmanim(std::vector<std::string>& args) {
     std::string forPrep = pullArg(args);
 
     if (forPrep != "for") throw std::invalid_argument(
-        "The meaning of '" + forPrep + "' in this context is unknown."
+        "'for' expected after get, not '" + forPrep + "'."
     );
 
     Timespan dateRange = parseTimespan(args);
@@ -54,7 +29,7 @@ void parseGetZmanim(std::vector<std::string>& args) {
     std::string inPrep = pullArg(args);
 
     if (inPrep != "in") throw std::invalid_argument(
-        "The meaning of '" + inPrep + "' in this context is unknown."
+        "'in' expected after the date(s), not '" + inPrep + "'."
     );
 
     std::string location = argsVectorToString(args, " ");
@@ -67,7 +42,7 @@ void parseGetZmanim(std::vector<std::string>& args) {
 
     auto res = cli.Get("/complete.php", httplib::Params(
         {
-            {"q", location}
+            { "q", location }
         }
     ), httplib::Headers());
 
@@ -105,8 +80,23 @@ void parseGetZmanim(std::vector<std::string>& args) {
             }
         }
     }
-
     std::string zip = chosenLocationJson["id"].get<std::string>();
+
+    if (chosenLocationJson["latitude"].is_null()) {
+        res = cli.Get("/complete.php", httplib::Params(
+            {
+                { "q", zip }
+            }
+        ), httplib::Headers());
+
+        if (res->status != 200) throw std::runtime_error(notFoundError);
+
+        locationsJson = json::parse(res->body);
+        chosenLocationJson = locationsJson[0];
+    }
+
+    double latitude = chosenLocationJson["latitude"].get<double>();
+    double longitude = chosenLocationJson["longitude"].get<double>();
 
     tm startDate = dateRange.getStart();
     tm endDate = dateRange.getEnd();
@@ -119,7 +109,7 @@ void parseGetZmanim(std::vector<std::string>& args) {
 
     std::cout << "Generating zmanim documents for " << dateRangeStr << " in " << locationTitle << "...\n";
 
-    DocumentInfo zmanimJson = get_zmanim(dateRange, "2", zip);
+    DocumentInfo zmanimJson = get_zmanim(dateRange, "2", zip, latitude, longitude);
 
     std::ofstream outputHtml("zmanim.html");
     std::ofstream outputCss("styles.css");
@@ -131,4 +121,37 @@ void parseGetZmanim(std::vector<std::string>& args) {
 
     outputHtml.close();
     outputCss.close();
+}
+
+void parseGet(std::vector<std::string>& args) {
+    std::string what = pullArg(args);
+
+    if (what == "zmanim" || what == "times") {
+        parseGetZmanim(args);
+    }
+    else {
+        throw std::invalid_argument("The meaning of '" + what + "' after get is unknown.");
+    }
+}
+
+void parseGetHelp(std::vector<std::string>& args) {
+    std::cout << "Enter commands in lowercase.\n"
+        "\n"
+        "get\n"
+        "    help: get this help message.\n"
+        "    zmanim/times for (span of time) in (zip code): generate a zmanim document with the given info.\n"
+        "\n"
+        "A span of time can be a date, '(date) to (date)', or 'next shabbos/shabbat'.\n"
+        "A zip code may be a zip code name in addition to being a sequence of numbers.\n";
+}
+
+void parseCommand(std::vector<std::string>& args) {
+    std::string cmd = pullArg(args);
+
+    if (cmd == "get") {
+        parseGet(args);
+    }
+    else {
+        throw std::invalid_argument("There is no '" + cmd + "' command.");
+    }
 }

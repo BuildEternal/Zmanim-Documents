@@ -1,5 +1,7 @@
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <sstream>
+#include <regex>
 
 #include "time_util.h"
 
@@ -13,8 +15,6 @@ tm normalizeTm(tm toNormalize) {
 
     return *localtime(&asTimeT);
 }
-
-// TODO: eliminate this yucky method
 
 /**
  * @brief Returns if the given `tm` is valid.
@@ -61,14 +61,62 @@ std::string dateToSuffix(int date) {
     if (11 <= date && date <= 13) return "th";
 
     switch (date % 10) {
-        case 1: return "st";
-        case 2: return "nd";
-        case 3: return "rd";
-        default: return "th";
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
+    default: return "th";
     }
 }
 
-bool lessTm(tm a, tm b) {
+tm tmFromString(std::string str, bool basicOnly) {
+    tm newTm;
+
+    if (!basicOnly) {
+        std::regex dateRegex(R"((\d{4})-(\d{2})-(\d{2}))");
+        std::smatch dateValues;
+        if (std::regex_search(str, dateValues, dateRegex)) {
+            newTm.tm_year = stoi(dateValues[1]) - 1900;
+            newTm.tm_mon = stoi(dateValues[2]) - 1;
+            newTm.tm_mday = stoi(dateValues[3]);
+        }
+
+        std::regex basicDateRegex(R"((\d{1,2})/(\d{1,2})/(\d{1,2}|\d{4}))");
+        std::smatch basicDateVals;
+        if (std::regex_search(str, basicDateVals, basicDateRegex)) {
+            newTm.tm_mon = stoi(basicDateVals[1]) - 1;
+            newTm.tm_mday = stoi(basicDateVals[2]);
+            newTm.tm_year = basicDateVals[3].length() <= 2 ?
+                stoi(basicDateVals[3]) + 100 : stoi(basicDateVals[3]) - 1900;
+        }
+
+        std::regex timeRegex(R"((\d{2}):(\d{2}):(\d{2}))");
+        std::smatch timeValues;
+        if (std::regex_search(str, timeValues, timeRegex)) {
+            newTm.tm_hour = stoi(timeValues[1]);
+            newTm.tm_min = stoi(timeValues[2]);
+            newTm.tm_sec = stoi(timeValues[3]);
+        }
+    }
+    else {
+        std::regex basicDateRegex(R"(^(\d{1,2})/(\d{1,2})/(\d{1,2}|\d{4})$)");
+        std::smatch basicDateVals;
+        if (std::regex_search(str, basicDateVals, basicDateRegex)) {
+            newTm.tm_mon = stoi(basicDateVals[1]) - 1;
+            newTm.tm_mday = stoi(basicDateVals[2]);
+            newTm.tm_year = basicDateVals[3].length() <= 2 ?
+                stoi(basicDateVals[3]) + 100 : stoi(basicDateVals[3]) - 1900;
+        }
+    }
+
+    return newTm;
+}
+
+std::string tmToBasicDateString(tm tmToConvert) {
+    return (std::stringstream() <<
+        tmToConvert.tm_mon + 1 << '/' << tmToConvert.tm_mday << '/' << tmToConvert.tm_year + 1900).str();
+}
+
+bool lessTmDateOnly(const tm& a, const tm& b) {
     if (a.tm_year < b.tm_year) return true;
     else if (a.tm_year > b.tm_year) return false;
 
@@ -76,12 +124,21 @@ bool lessTm(tm a, tm b) {
     else if (a.tm_mon > b.tm_mon) return false;
 
     if (a.tm_mday < b.tm_mday) return true;
-    else if (a.tm_mday > b.tm_mday) return false;
+
+    return false;
+}
+
+bool lessTm(const tm& a, const tm& b) {
+    if (lessTmDateOnly(a, b)) return true;
+    else if (lessTmDateOnly(b, a)) return false;
 
     if (a.tm_hour < b.tm_hour) return true;
     else if (a.tm_hour > b.tm_hour) return false;
 
     if (a.tm_min < b.tm_min) return true;
+    else if (a.tm_min > b.tm_min) return false;
+
+    if (a.tm_sec < b.tm_sec) return true;
 
     return false;
 }

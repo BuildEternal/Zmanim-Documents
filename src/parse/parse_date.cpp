@@ -12,19 +12,48 @@
 // TODO: parse phrases like "next shabbos" or "next shavuot"
 
 Timespan parseTimespan(std::vector<std::string>& args) {
-    tm beginDate = parseDate(args);
+    std::string keyword = peakArg(args);
 
-    std::string prep = peakArg(args);
-
-    if (prep == "to" || prep == "through") {
+    if (keyword == "next") {
         pullArg(args);
 
-        tm endDate = parseDate(args);
+        std::string word = pullArg(args);
 
-        return Timespan(beginDate, endDate);
-    } else {
-        return Timespan(beginDate);
+        if (word == "shabbos" || word == "shabbat") {
+            time_t currentTime = time(nullptr);
+            tm currentDate = *localtime(&currentTime);
+
+            int daysUntilShabbos = 6 - currentDate.tm_wday;
+
+            tm shabbos = currentDate;
+            shabbos.tm_mday += daysUntilShabbos;
+            shabbos = normalizeTm(shabbos);
+
+            tm erevShabbos = currentDate;
+            erevShabbos.tm_mday += daysUntilShabbos - 1;
+            erevShabbos = normalizeTm(erevShabbos);
+
+            return Timespan(erevShabbos, shabbos);
+        }
+        else throw std::invalid_argument("The meaning of '" + word + "' after 'next' is unknown.");
     }
+    else {
+        tm beginDate = parseDate(args);
+
+        std::string prep = peakArg(args);
+
+        if (prep == "to" || prep == "through") {
+            pullArg(args);
+
+            tm endDate = parseDate(args);
+
+            return Timespan(beginDate, endDate);
+        }
+        else {
+            return Timespan(beginDate);
+        }
+    }
+
 }
 
 tm parseDate(std::vector<std::string>& args) {
@@ -45,7 +74,7 @@ tm parseDate(std::vector<std::string>& args) {
 
         if (!matched)
             throw std::invalid_argument("The date '" + date_str + "' is invalid. Make sure it is a valid date, is "
-                "formatted as 'dd/mm/yy' or 'dd/mm/yyyy', and is within a reasonable time frame.");
+                "formatted as '(d)d/(m)m/(yyy)y', and is within a reasonable time frame.");
 
         int day = stoi(date_match[2]);
         int month = stoi(date_match[1]);
