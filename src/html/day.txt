@@ -3,7 +3,9 @@ R"===(
 <div class="dayInfo">
     <div class="dayInfo__title">
         <h1 class="dayInfo__title__date">{date}</h1>
-        {if_holiday
+        {if_hebrew_date
+        <p class="dayInfo__title__description">{hebrew_date}</p>
+        if_hebrew_date} {if_holiday
         <p class="dayInfo__title__description">{holiday}</p>
         if_holiday} {if_parsha
         <p class="dayInfo__title__description">

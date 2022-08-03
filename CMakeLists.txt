@@ -5,6 +5,7 @@ project(Zmanim)
 
 set(SRC
     src/forecast.cpp
+    src/get_hebrew_dates.cpp
     src/get_zmanim.cpp
     src/main.cpp
     src/parse/args.cpp

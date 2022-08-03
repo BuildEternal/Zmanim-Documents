@@ -12,9 +12,11 @@ std::string monthToString(int month);
 
 std::string dateToSuffix(int date);
 
-tm tmFromString(std::string str, bool basicOnly = false);
+tm tmFromString(std::string str, bool basicString = false);
 
 std::string tmToBasicDateString(tm tmToConvert);
+
+std::string tmToDateString(tm tmToConvert);
 
 bool lessTmDateOnly(const tm& a, const tm& b);
 

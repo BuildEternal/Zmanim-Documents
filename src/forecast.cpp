@@ -42,8 +42,6 @@ std::map<tm, std::map<bool, WeatherEntryInfo>, decltype(&lessTmDateOnly)> getFor
     auto forecastRes = weatherCli.Get(
         "/gridpoints/" + gridId + '/' + std::to_string(gridX) + ',' + std::to_string(gridY) + "/forecast");
 
-    std::cout << forecastRes->status << '\n';
-
     if (forecastRes->status != 200) throw std::runtime_error("Error getting the forecast.");
 
     json forecastJson = json::parse(forecastRes->body)["properties"];

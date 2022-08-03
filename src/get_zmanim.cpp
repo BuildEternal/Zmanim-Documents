@@ -6,9 +6,11 @@
 #include <iomanip>
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "cpp-httplib/httplib.h"
+#include <httplib.h>
+#include <nlohmann/json.hpp>
+
 #include "forecast.h"
-#include "nlohmann/json.hpp"
+#include "get_hebrew_dates.h"
 #include "time_util.h"
 #include "timespan.h"
 #include "zmanim/day_info.h"
@@ -59,6 +61,8 @@ DocumentInfo get_zmanim(
     const Timespan& timespan, std::string locationType, std::string locationId,
     double forecastLat, double forecastLong
 ) {
+    // Get zmanim
+
     httplib::Client cli("https://www.chabad.org");
 
     tm start = timespan.getStart();
@@ -83,7 +87,13 @@ DocumentInfo get_zmanim(
 
     if (zmanimJson["LocationId"].is_null()) throw std::runtime_error(getZmanimError);
 
+    // Get weather
+
     auto forecast = getForecastForCoords(forecastLat, forecastLong);
+
+    // Get Hebrew dates
+
+    auto heDates = getHebrewDates(timespan);
 
     // Extract data from JSON
 
@@ -95,18 +105,24 @@ DocumentInfo get_zmanim(
         json dayJson = *i;
         auto daysIndex = i - daysJsonArray.begin();
 
-        // TODO: Make this parse the day in the json
+        std::cout << dayJson["DisplayDate"].get<std::string>() << ' ';
 
-        tm date = start;
-        date.tm_mday += daysIndex;
-        date = normalizeTm(date);
+        tm date = tmFromString(dayJson["DisplayDate"].get<std::string>(), true);
+
+        date.tm_wday = dayJson["DayOfWeek"].get<int>();
+
+        std::cout << date.tm_mon + 1 << '/' << date.tm_mday << '/' << date.tm_year + 1900 << ' ';
+
+        std::cout << tmToBasicDateString(date) << '\n';
+
+        std::string heDate = heDates[date];
 
         std::string holiday;
 
         {
             json holidayJson = dayJson["HolidayName"];
 
-            if (holidayJson.type() == json::value_t::string)
+            if (holidayJson.is_string())
                 holiday = holidayJson.get<std::string>();
         }
 
@@ -137,7 +153,7 @@ DocumentInfo get_zmanim(
         WeatherEntryInfo dayForecast = forecast[date][true];
         WeatherEntryInfo nightForecast = forecast[date][false];
 
-        DayInfo dayInfo(date, holiday, parsha, zmanim, dayForecast, nightForecast);
+        DayInfo dayInfo(date, heDate, holiday, parsha, zmanim, dayForecast, nightForecast);
 
         days.push_back(dayInfo);
     }
@@ -149,17 +165,6 @@ DocumentInfo get_zmanim(
     std::string returnedLocationId = zmanimJson["LocationId"].get<std::string>();
 
     DocumentInfo documentInfo(days, location, locationDetails, returnedLocationId);
-
-    for (auto a : forecast) {
-        std::cout << '\n' << tmToBasicDateString(a.first) << ":\n";
-
-        for (auto b : a.second) {
-            std::cout << "  " << (b.first ? "day" : "night") << ": ";
-
-            std::cout << b.second.getTemp() << b.second.getTempUnit() << " - " << b.second.getWindDirection() << ' ' <<
-                b.second.getWindSpeed() << '\n';
-        }
-    }
 
     return documentInfo;
 

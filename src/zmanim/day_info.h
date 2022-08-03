@@ -10,6 +10,7 @@ class DayInfo {
     static std::string htmlTemplate;
 
     tm date;
+    std::string heDate;
     std::string holiday;
     std::string parsha;
     std::vector<ZmanInfo> zmanim;
@@ -19,6 +20,7 @@ class DayInfo {
 public:
     DayInfo(
         tm newDate,
+        std::string newHeDate,
         std::string newHoliday,
         std::string newParsha,
         std::vector<ZmanInfo> newZmanim,
@@ -27,6 +29,7 @@ public:
     );
 
     tm getDate() const;
+    std::string getHeDate() const;
     std::string getHoliday() const;
     std::string getParsha() const;
     std::vector<ZmanInfo> getZmanim() const;

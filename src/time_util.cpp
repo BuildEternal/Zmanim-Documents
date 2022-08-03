@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include <iomanip>
 
 #include "time_util.h"
 
@@ -68,25 +69,16 @@ std::string dateToSuffix(int date) {
     }
 }
 
-tm tmFromString(std::string str, bool basicOnly) {
+tm tmFromString(std::string str, bool basicString) {
     tm newTm;
 
-    if (!basicOnly) {
+    if (!basicString) {
         std::regex dateRegex(R"((\d{4})-(\d{2})-(\d{2}))");
         std::smatch dateValues;
         if (std::regex_search(str, dateValues, dateRegex)) {
             newTm.tm_year = stoi(dateValues[1]) - 1900;
             newTm.tm_mon = stoi(dateValues[2]) - 1;
             newTm.tm_mday = stoi(dateValues[3]);
-        }
-
-        std::regex basicDateRegex(R"((\d{1,2})/(\d{1,2})/(\d{1,2}|\d{4}))");
-        std::smatch basicDateVals;
-        if (std::regex_search(str, basicDateVals, basicDateRegex)) {
-            newTm.tm_mon = stoi(basicDateVals[1]) - 1;
-            newTm.tm_mday = stoi(basicDateVals[2]);
-            newTm.tm_year = basicDateVals[3].length() <= 2 ?
-                stoi(basicDateVals[3]) + 100 : stoi(basicDateVals[3]) - 1900;
         }
 
         std::regex timeRegex(R"((\d{2}):(\d{2}):(\d{2}))");
@@ -111,9 +103,18 @@ tm tmFromString(std::string str, bool basicOnly) {
     return newTm;
 }
 
+// tm to mm/dd/yyyy
 std::string tmToBasicDateString(tm tmToConvert) {
     return (std::stringstream() <<
         tmToConvert.tm_mon + 1 << '/' << tmToConvert.tm_mday << '/' << tmToConvert.tm_year + 1900).str();
+}
+
+// tm to yyyy-mm-dd
+std::string tmToDateString(tm tmToConvert) {
+    return (std::stringstream() << std::setfill('0') <<
+        std::setw(4) << tmToConvert.tm_year + 1900 << '-' <<
+        std::setw(2) << tmToConvert.tm_mon + 1 << '-' <<
+        std::setw(2) << tmToConvert.tm_mday).str();
 }
 
 bool lessTmDateOnly(const tm& a, const tm& b) {
