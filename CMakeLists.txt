@@ -13,10 +13,10 @@ set(SRC
     src/parse/parse_date.cpp
     src/time_util.cpp
     src/timespan.cpp
-    src/zmanim/day_info.cpp
-    src/zmanim/document_info.cpp
-    src/zmanim/weather_entry_info.cpp
-    src/zmanim/zman_info.cpp
+    src/html_builders/day_info.cpp
+    src/html_builders/document_info.cpp
+    src/html_builders/weather_entry_info.cpp
+    src/html_builders/zman_info.cpp
 )
 
 set(INCS

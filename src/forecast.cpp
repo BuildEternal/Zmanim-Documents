@@ -8,7 +8,7 @@
 
 #include "forecast.h"
 #include "time_util.h"
-#include "zmanim/weather_entry_info.h"
+#include "html_builders/weather_entry_info.h"
 
 using nlohmann::json;
 

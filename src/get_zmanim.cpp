@@ -13,10 +13,10 @@
 #include "get_hebrew_dates.h"
 #include "time_util.h"
 #include "timespan.h"
-#include "zmanim/day_info.h"
-#include "zmanim/document_info.h"
-#include "zmanim/weather_entry_info.h"
-#include "zmanim/zman_info.h"
+#include "html_builders/day_info.h"
+#include "html_builders/document_info.h"
+#include "html_builders/weather_entry_info.h"
+#include "html_builders/zman_info.h"
 
 using json = nlohmann::json;
 
