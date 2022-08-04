@@ -12,9 +12,6 @@ int main(int argc, char* argv[])
 
         parseCommand(args);
     }
-    catch (std::invalid_argument& e) {
-        std::cout << "Something was wrong with your command:\n" << e.what();
-    }
     catch (std::exception& e) {
         std::cout << "Something went wrong:\n" << e.what();
     }

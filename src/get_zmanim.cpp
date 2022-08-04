@@ -79,13 +79,9 @@ DocumentInfo get_zmanim(
         { { "Accept", "application/json" } }
     ));
 
-    const std::string getZmanimError = "An error accurred when getting zmanim.";
-
-    if (res->status != 200) throw std::runtime_error(getZmanimError);
+    if (res->status != 200) throw std::runtime_error("Could not successfully retrieve zmanim.");
 
     auto zmanimJson = json::parse(res->body);
-
-    if (zmanimJson["LocationId"].is_null()) throw std::runtime_error(getZmanimError);
 
     // Get weather
 
@@ -101,10 +97,7 @@ DocumentInfo get_zmanim(
 
     json daysJsonArray = zmanimJson["Days"];
 
-    for (auto i = daysJsonArray.begin(); i < daysJsonArray.end(); i++) {
-        json dayJson = *i;
-        auto daysIndex = i - daysJsonArray.begin();
-
+    for (auto dayJson : daysJsonArray) {
         tm date = tmFromString(dayJson["DisplayDate"].get<std::string>(), true);
 
         date.tm_wday = dayJson["DayOfWeek"].get<int>();
