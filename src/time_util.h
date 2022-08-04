@@ -10,6 +10,8 @@ std::string monthName(int month);
 
 std::string monthToString(int month);
 
+std::string dayToString(int wday);
+
 std::string dateToSuffix(int date);
 
 tm tmFromString(std::string str, bool basicString = false);

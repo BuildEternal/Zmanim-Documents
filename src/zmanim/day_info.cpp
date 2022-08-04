@@ -31,8 +31,8 @@ nightForecast(newNightForecast)
 
     // Date
     std::stringstream dateString;
-    dateString << monthToString(newDate.tm_mon)
-        << ' ' << newDate.tm_mday << dateToSuffix(newDate.tm_mday) << ", " << newDate.tm_year + 1900;
+    dateString << dayToString(newDate.tm_wday) << ", " << monthToString(newDate.tm_mon)
+        << ' ' << newDate.tm_mday << ", " << newDate.tm_year + 1900;
 
     html = htmlTemplate;
 

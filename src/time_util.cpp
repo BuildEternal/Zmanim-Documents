@@ -53,9 +53,21 @@ std::string monthToString(int month) {
     case 9: return "October";
     case 10: return "November";
     case 11: return "December";
+    default: return "";
     }
+}
 
-    return "";
+std::string dayToString(int wday) {
+    switch (wday) {
+    case 0: return "Sunday";
+    case 1: return "Monday";
+    case 2: return "Tuesday";
+    case 3: return "Wednesday";
+    case 4: return "Thursday";
+    case 5: return "Friday";
+    case 6: return "Shabbat";
+    default: return "";
+    }
 }
 
 std::string dateToSuffix(int date) {

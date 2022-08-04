@@ -105,15 +105,9 @@ DocumentInfo get_zmanim(
         json dayJson = *i;
         auto daysIndex = i - daysJsonArray.begin();
 
-        std::cout << dayJson["DisplayDate"].get<std::string>() << ' ';
-
         tm date = tmFromString(dayJson["DisplayDate"].get<std::string>(), true);
 
         date.tm_wday = dayJson["DayOfWeek"].get<int>();
-
-        std::cout << date.tm_mon + 1 << '/' << date.tm_mday << '/' << date.tm_year + 1900 << ' ';
-
-        std::cout << tmToBasicDateString(date) << '\n';
 
         std::string heDate = heDates[date];
 

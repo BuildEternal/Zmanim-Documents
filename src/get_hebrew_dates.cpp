@@ -57,9 +57,5 @@ std::map<tm, std::string, decltype(&lessTmDateOnly)> getHebrewDates(Timespan dat
         hebrewDates.emplace(gTime, heDate);
     }
 
-    for (auto [a, b]: hebrewDates) {
-        std::cout << tmToBasicDateString(a) << ' ' << b << '\n';
-    }
-
     return hebrewDates;
 }
