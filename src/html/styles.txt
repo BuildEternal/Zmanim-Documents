@@ -12,7 +12,8 @@ body {
     --border-width: 2px;
 
     /* colors */
-    --day-border: darkblue;
+    --day-border-color: darkblue;
+    --metadata-color: gray;
     --zmanim-list-secondary-color: hsl(240, 100%, 98%);
 
     --weather-icon-color: rgb(255, 225, 75);
@@ -36,9 +37,13 @@ h1 {
     font-size: 1.5em;
 }
 
+.title {
+    font-weight: bold;
+}
+
 .dayInfo {
-    border-top: var(--border-width) solid var(--day-border);
-    border-bottom: var(--border-width) solid var(--day-border);
+    border-top: var(--border-width) solid var(--day-border-color);
+    border-bottom: var(--border-width) solid var(--day-border-color);
     margin: var(--spacing);
     margin-bottom: calc(-1 * var(--spacing) - var(--border-width));
 
@@ -111,6 +116,8 @@ h1 {
 
 .dayInfo__weather__entry__details {
     grid-area: details;
+
+    font-size: smaller;
 }
 
 .dayInfo__times {
@@ -147,6 +154,16 @@ h1 {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.dayInfoMargin {
+    padding-bottom: calc(var(--spacing) + var(--border-width));
+    margin-bottom: var(--spacing);
+}
+
+.metadata {
+    font-size: smaller;
+    color: var(--metadata-color);
 }
 
 )==="

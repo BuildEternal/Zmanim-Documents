@@ -15,9 +15,7 @@ R"===(
         <p class="dayInfo__weather__entry__info__temp">{temperature}</p>
         <p class="dayInfo__weather__entry__info__wind">{wind}</p>
     </div>
-    <div class="dayInfo__weather__entry__details">
-        <p>{details}</p>
-    </div>
+    <p class="dayInfo__weather__entry__details">{details}</p>
 </div>
 
 )==="

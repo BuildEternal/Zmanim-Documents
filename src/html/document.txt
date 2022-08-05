@@ -9,10 +9,12 @@ R"===(
 
         <link rel="stylesheet" href="styles.css" />
 
-        <title>Zmanim</title>
+        <title>Zmanim for {location_name}</title>
     </head>
     <body>
+        <p class="title">Zmanim for {location_name}</p>
         {days}
+        <div class="dayInfoMargin"></div>
     </body>
 </html>
 
