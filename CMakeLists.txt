@@ -4,19 +4,19 @@ cmake_minimum_required(VERSION 3.10)
 project(Zmanim)
 
 set(SRC
-    src/forecast.cpp
-    src/get_hebrew_dates.cpp
-    src/get_zmanim.cpp
+    src/command/args_util.cpp
+    src/command/parse_command.cpp
+    src/command/parse_date.cpp
+    src/html_builders/day_html.cpp
+    src/html_builders/document_html.cpp
+    src/html_builders/forecast_entry_html.cpp
+    src/html_builders/zman_html.cpp
     src/main.cpp
-    src/parse/args.cpp
-    src/parse/parse_command.cpp
-    src/parse/parse_date.cpp
     src/time_util.cpp
-    src/timespan.cpp
-    src/html_builders/day_info.cpp
-    src/html_builders/document_info.cpp
-    src/html_builders/weather_entry_info.cpp
-    src/html_builders/zman_info.cpp
+    src/web/forecast.cpp
+    src/web/hebrew_dates.cpp
+    src/web/zip_codes.cpp
+    src/web/zmanim.cpp
 )
 
 set(INCS

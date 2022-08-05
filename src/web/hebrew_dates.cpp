@@ -7,22 +7,21 @@
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 
-#include "time_util.h"
-#include "timespan.h"
+#include "../time_util.h"
 
-#include "get_hebrew_dates.h"
+#include "hebrew_dates.h"
 
 using nlohmann::json;
 
-std::map<tm, std::string, decltype(&lessTmDateOnly)> getHebrewDates(Timespan dates) {
+HebrewDateMap getHebrewDates(const DateRange& dates) {
     httplib::Client hebcalCli("https://www.hebcal.com");
 
     auto res = hebcalCli.Get("/converter", httplib::Params(
         {
             { "cfg", "json" },
             { "g2h", "1" },
-            { "start", tmToDateString(dates.getStart()) },
-            { "end", tmToDateString(dates.getEnd()) }
+            { "start", tmToIsoDateString(dates.getStart()) },
+            { "end", tmToIsoDateString(dates.getEnd()) }
         }
     ), httplib::Headers());
 
@@ -36,7 +35,7 @@ std::map<tm, std::string, decltype(&lessTmDateOnly)> getHebrewDates(Timespan dat
         datesJsonObject = datesJsonObject["hdates"];
 
         for (auto [dt, dj] : datesJsonObject) {
-            tm gTime = tmFromString(dt);
+            tm gTime = stringToTm(dt);
             std::string heDate = std::to_string(dj["hd"].get<int>()) + ' ' +
                 dj["hm"].get<std::string>() + ", " +
                 std::to_string(dj["hy"].get<int>());

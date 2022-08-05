@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 
-#include "timespan.h"
+#include "../time_util.h"
 
-Timespan parseTimespan(std::vector<std::string>& args);
+DateRange parseTimespan(std::vector<std::string>& args);
 
 tm parseDate(std::vector<std::string>& args);

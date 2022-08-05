@@ -1,36 +1,29 @@
 #include <ctime>
-#include <iostream>
-#include <sstream>
-#include <regex>
 #include <iomanip>
+#include <iostream>
+#include <regex>
+#include <sstream>
+#include <string>
+#include <stdexcept>
 
 #include "time_util.h"
-
-using namespace std;
 
 tm normalizeTm(tm toNormalize) {
     time_t asTimeT = mktime(&toNormalize);
 
     if (asTimeT == -1)
-        throw invalid_argument("A time was invalid.");
+        throw std::invalid_argument("A time was invalid.");
 
     return *localtime(&asTimeT);
 }
 
-/**
- * @brief Returns if the given `tm` is valid.
- *
- * @param check The `tm` to be checked
- * @return `true` if the `tm` correctly represents a date and is after the Unix epoch, and `false` if the `tm` does not
- * correctly represent a date or is after the Unix epoch.
- */
-bool valid_dmy(const tm& check) {
+bool validTmDateOnly(const tm& check) {
     auto copy = check;
 
     try {
         copy = normalizeTm(copy);
     }
-    catch (invalid_argument) {
+    catch (std::invalid_argument) {
         return false;
     }
 
@@ -70,21 +63,10 @@ std::string dayToString(int wday) {
     }
 }
 
-std::string dateToSuffix(int date) {
-    if (11 <= date && date <= 13) return "th";
-
-    switch (date % 10) {
-    case 1: return "st";
-    case 2: return "nd";
-    case 3: return "rd";
-    default: return "th";
-    }
-}
-
-tm tmFromString(std::string str, bool basicString) {
+tm stringToTm(std::string str, bool basicDate) {
     tm newTm;
 
-    if (!basicString) {
+    if (!basicDate) {
         std::regex dateRegex(R"((\d{4})-(\d{2})-(\d{2}))");
         std::smatch dateValues;
         if (std::regex_search(str, dateValues, dateRegex)) {
@@ -122,11 +104,29 @@ std::string tmToBasicDateString(tm tmToConvert) {
 }
 
 // tm to yyyy-mm-dd
-std::string tmToDateString(tm tmToConvert) {
+std::string tmToIsoDateString(tm tmToConvert) {
     return (std::stringstream() << std::setfill('0') <<
         std::setw(4) << tmToConvert.tm_year + 1900 << '-' <<
         std::setw(2) << tmToConvert.tm_mon + 1 << '-' <<
         std::setw(2) << tmToConvert.tm_mday).str();
+}
+
+// tm to weekday, month day, year
+std::string tmToPrettyDateString(tm tmToConvert, bool includeWeekday, bool includeTime) {
+    std::string timeStr;
+
+    if (includeTime) {
+        int hour = tmToConvert.tm_hour % 12;
+        if (!hour) hour = 12;
+        int min = tmToConvert.tm_min;
+        std::string meridiem = tmToConvert.tm_hour % 12 ? "PM" : "AM";
+
+        timeStr = (std::stringstream() << std::setfill('0') << ' ' <<
+            hour << ':' << std::setw(2) << min << ' ' << meridiem).str();
+    }
+
+    return (includeWeekday ? dayToString(tmToConvert.tm_wday) + ", " : "") + monthToString(tmToConvert.tm_mon) + ' ' +
+        std::to_string(tmToConvert.tm_mday) + ", " + std::to_string(tmToConvert.tm_year + 1900) + timeStr;
 }
 
 bool lessTmDateOnly(const tm& a, const tm& b) {
@@ -141,17 +141,13 @@ bool lessTmDateOnly(const tm& a, const tm& b) {
     return false;
 }
 
-bool lessTm(const tm& a, const tm& b) {
-    if (lessTmDateOnly(a, b)) return true;
-    else if (lessTmDateOnly(b, a)) return false;
-
-    if (a.tm_hour < b.tm_hour) return true;
-    else if (a.tm_hour > b.tm_hour) return false;
-
-    if (a.tm_min < b.tm_min) return true;
-    else if (a.tm_min > b.tm_min) return false;
-
-    if (a.tm_sec < b.tm_sec) return true;
-
-    return false;
+DateRange::DateRange(const tm& start, const tm& end) : start(start), end(end) {
+    if (lessTmDateOnly(end, start))
+        throw std::runtime_error("You cannot create a date range with the end before the start.");
 }
+
+DateRange::DateRange(const tm& time) : start(time), end(time) { }
+
+const tm& DateRange::getStart() const { return start; }
+
+const tm& DateRange::getEnd() const { return end; }
