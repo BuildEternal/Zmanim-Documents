@@ -10,10 +10,10 @@
 
 // TODO: parse phrases like "next shabbos" or "next shavuot"
 
-DateRange parseTimespan(std::vector<std::string>& args) {
+DateRange parseDateRange(std::vector<std::string>& args) {
     std::string keyword = peakArg(args);
 
-    if (keyword == "next") {
+    if (keyword == "next" || keyword == "this") {
         pullArg(args);
 
         std::string word = pullArg(args);

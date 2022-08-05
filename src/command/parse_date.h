@@ -6,6 +6,6 @@
 
 #include "../time_util.h"
 
-DateRange parseTimespan(std::vector<std::string>& args);
+DateRange parseDateRange(std::vector<std::string>& args);
 
 tm parseDate(std::vector<std::string>& args);

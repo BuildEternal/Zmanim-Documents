@@ -20,7 +20,7 @@ void parseGetZmanim(std::vector<std::string>& args) {
     if (forPrep == "") throw std::invalid_argument("'for' expected after 'get'.");
     else if (forPrep != "for") throw std::invalid_argument("'for' expected after 'get', not '" + forPrep + "'.");
 
-    DateRange dateRange = parseTimespan(args);
+    DateRange dateRange = parseDateRange(args);
 
     const tm& startDate = dateRange.getStart();
     const tm& endDate = dateRange.getEnd();
@@ -108,8 +108,8 @@ void parseGetHelp(std::vector<std::string>& args) {
         "    help: get this help message.\n"
         "    zmanim/times for (span of dates) in (zip code): generate a zmanim document with the given info.\n"
         "\n"
-        "A span of dates can be a date, '(date) to (date)', or 'next shabbos/shabbat'.\n"
-        "A date is in the format [M]M/[D]D/[[YY]Y]Y. You may encounter issues if the date is too far in the past "
+        "A span of dates can be a date, '(date) to (date)', or 'next/this shabbos/shabbat'.\n"
+        "A date is in the format [M]M/[D]D/[[YY]Y]Y. You may encounter issues if a date is too far in the past "
         "or future.\n"
         "A zip code may also be a place name if that place corresponds to a zip code.\n\n";
 }
