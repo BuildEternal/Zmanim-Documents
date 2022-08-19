@@ -10,11 +10,13 @@
 class Zman {
     std::string title;
     std::string zman;
+    std::string type;
 public:
-    Zman(const std::string& title, const std::string& zman);
+    Zman(const std::string& title, const std::string& zman, const std::string& type);
 
     const std::string& getTitle() const;
     const std::string& getZman() const;
+    const std::string& getType() const;
 };
 
 class DayZmanimData {

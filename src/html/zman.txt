@@ -1,8 +1,12 @@
 R"===(
 
 <li class="dayInfo__times__entry">
-    <span class="dayInfo__times__entry__title">{title}</span>
-    <span class="dayInfo__times__entry__time">{time}</span>
+    <span class="dayInfo__times__entry__title">
+        {if_emphasized <b> if_emphasized} {title} {if_emphasized </b> if_emphasized}
+    </span>
+    <span class="dayInfo__times__entry__time">
+        {if_emphasized <b> if_emphasized} {time} {if_emphasized </b> if_emphasized}
+    </span>
 </li>
 
 )==="

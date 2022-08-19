@@ -13,10 +13,12 @@
 
 using nlohmann::json;
 
-Zman::Zman(const std::string& title, const std::string& zman) : title(title), zman(zman) { }
+Zman::Zman(const std::string& title, const std::string& zman, const std::string& type) :
+    title(title), zman(zman), type(type) { }
 
 const std::string& Zman::getTitle() const { return title; }
 const std::string& Zman::getZman() const { return zman; }
+const std::string& Zman::getType() const { return type; }
 
 DayZmanimData::DayZmanimData(const std::string& holiday, const std::string& parsha, const std::vector<Zman>& zmanim) :
     holiday(holiday), parsha(parsha), zmanim(zmanim) { }
@@ -77,8 +79,9 @@ ZmanimData getZmanim(const DateRange& dates, const std::string& zipCode) {
         for (auto& zmanJson : zmanimJsonArray) {
             std::string title = zmanJson["Title"].get<std::string>();
             std::string zman = zmanJson["Items"][0]["Zman"].get<std::string>();
+            std::string type = zmanJson["Items"][0]["ZmanType"].get<std::string>();
 
-            zmanim.push_back(Zman(title, zman));
+            zmanim.push_back(Zman(title, zman, type));
         }
 
         dayData.emplace(date, DayZmanimData(holiday, parsha, zmanim));

@@ -8,7 +8,7 @@ R"===(
 
 body {
     /* spacing */
-    --spacing: 5px;
+    --spacing: 4px;
     --border-width: 2px;
 
     /* colors */
@@ -19,6 +19,7 @@ body {
     --weather-icon-color: rgb(255, 225, 75);
 
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
 }
