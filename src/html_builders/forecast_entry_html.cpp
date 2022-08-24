@@ -15,13 +15,13 @@ ForecastEntryHtml::ForecastEntryHtml(bool isDay, const ForecastEntry& forecastEn
     const std::string& windDirection = forecastEntry.getWindDirection();
 
     std::string windDirStr =
-        windDirection == "N" ? "⬆️" :
+        windDirection == "N" || windDirection == "NNE" || windDirection == "NNW" ? "⬆️" :
         windDirection == "NE" ? "↗️" :
-        windDirection == "E" ? "➡️" :
+        windDirection == "E" || windDirection == "ENE" || windDirection == "ESE" ? "➡️" :
         windDirection == "SE" ? "↘️" :
-        windDirection == "S" ? "⬇️" :
+        windDirection == "S" || windDirection == "SSE" || windDirection == "SSW" ? "⬇️" :
         windDirection == "SW" ? "↙️" :
-        windDirection == "W" ? "⬅️" :
+        windDirection == "W" || windDirection == "WNW" || windDirection == "WSW" ? "⬅️" :
         windDirection == "NW" ? "↖️" : "❓";
 
     html = std::regex_replace(
